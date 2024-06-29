@@ -123,6 +123,7 @@ REDIS_URL = f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/"
 if not REDIS_PASSWORD:
     REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
 
+# Redis Queue (Message Broker)
 ORDER_QUEUE_NAME = "order_queue"
 ORDER_QUEUE = Queue(
     ORDER_QUEUE_NAME, connection=Redis(REDIS_HOST, REDIS_PORT, password=REDIS_PASSWORD)

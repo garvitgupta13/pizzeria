@@ -3,8 +3,10 @@ from typing import Any
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rq import Retry
 
 from app.settings import ORDER_QUEUE
+from order.exceptions import report_failure
 from order.service import OrderService
 
 
@@ -54,5 +56,10 @@ class OrderViewSet(viewsets.ViewSet):
         order_cnt = request.data["order_cnt"]
         for _ in range(order_cnt):
             order_id = self.order_service.generate_order_id()
-            ORDER_QUEUE.enqueue(f=self.order_service.create_order, order_id=order_id)
+            ORDER_QUEUE.enqueue(
+                f=self.order_service.create_order,
+                order_id=order_id,
+                retry=Retry(max=3, interval=[10, 30, 60]),
+                on_failure=report_failure,
+            )
         return Response()
