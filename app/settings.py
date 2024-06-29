@@ -113,3 +113,18 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Redis configs
+REDIS_HOST = "localhost"
+REDIS_PORT = 6379
+REDIS_PASSWORD = None
+
+REDIS_URL = f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/"
+if not REDIS_PASSWORD:
+    REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/"
+
+ORDER_QUEUE_NAME = "order_queue"
+ORDER_QUEUE = Queue(
+    ORDER_QUEUE_NAME, connection=Redis(REDIS_HOST, REDIS_PORT, password=REDIS_PASSWORD)
+)
+QUEUES = [ORDER_QUEUE_NAME]

@@ -4,6 +4,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from app.settings import ORDER_QUEUE
 from order.service import OrderService
 
 
@@ -40,4 +41,18 @@ class OrderViewSet(viewsets.ViewSet):
         for _ in range(order_cnt):
             order_id = self.order_service.generate_order_id()
             OrderService.create_order(order_id)
+        return Response()
+
+    @action(detail=False, methods=["post"], url_path="enqueue")
+    def enqueue_order(self, request):
+        """
+        Enqueue orders to ORDER_QUEUE
+
+        :param request:
+        :return: HTTP Response
+        """
+        order_cnt = request.data["order_cnt"]
+        for _ in range(order_cnt):
+            order_id = self.order_service.generate_order_id()
+            ORDER_QUEUE.enqueue(f=self.order_service.create_order, order_id=order_id)
         return Response()
